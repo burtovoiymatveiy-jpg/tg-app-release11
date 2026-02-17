@@ -53,7 +53,7 @@
         @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 70% { transform: scale(1.2); opacity: 0.5; } 100% { transform: scale(0.9); opacity: 1; } }
 
         .main-btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; margin-top: 4px; }
-        .secondary-btn { background: var(--sec-bg); border: 1px solid var(--card-border); color: var(--accent); padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 600; text-align: center; flex: 1; cursor: pointer; }
+        .secondary-btn { background: var(--sec-bg); border: 1px solid var(--card-border); color: var(--accent); padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 600; text-align: center; flex: 1; cursor: pointer; width: 100%; box-sizing: border-box; }
         
         .preview-box { background: var(--sec-bg); border: 1px dashed var(--hint); border-radius: 12px; padding: 12px; font-family: monospace; font-size: 12px; white-space: pre-line; display: none; margin: 10px 0; border: 1px solid var(--accent); }
         .preview-box.show { display: block; }
@@ -79,7 +79,19 @@
         .advantage-icon { font-size: 20px; }
         .advantage-text { font-size: 9px; font-weight: 700; color: var(--hint); text-transform: uppercase; }
         
-        /* Уменьшено расстояние в margin-top */
+        /* Блок с уведомлением об отзыве */
+        .review-notice {
+            background: var(--sec-bg);
+            border: 1px dashed var(--accent);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.4;
+            color: var(--text);
+        }
+        .review-notice b { color: var(--accent); font-weight: 800; }
+
         .version-footer { font-size: 10px; color: var(--hint); text-align: center; margin-top: 4px; opacity: 0.5; font-weight: 600; letter-spacing: 0.5px; }
         .disclaimer { font-size: 10px; color: var(--hint); text-align: center; line-height: 1.4; }
     </style>
@@ -151,9 +163,10 @@
 <div class="preview-box" id="preview"></div>
 <button class="main-btn" onclick="checkSubAndCopy()">Скопировать анкету</button>
 
-<div class="row">
-    <button class="secondary-btn" style="color:var(--accent-red)" onclick="clearAll()">🗑 Очистить</button>
-    <button class="secondary-btn" onclick="tg.openTelegramLink('https://t.me/OTZblBblawarem')">⭐ Отзыв</button>
+<button class="secondary-btn" style="color:var(--accent-red)" onclick="clearAll()">🗑 Очистить форму</button>
+
+<div class="review-notice">
+    💬 После выполнения работы <b>обязательно</b> оставьте отзыв со своим @тегом!
 </div>
 
 <div class="disclaimer">
