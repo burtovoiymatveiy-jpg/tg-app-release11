@@ -7,253 +7,203 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg: #ffffff;
-            --sec-bg: #f4f4f5;
-            --text: #000000;
-            --hint: #707579;
-            --card-border: rgba(0,0,0,0.1);
-            --accent: #3390ec;
-            --accent-red: #ff3b30;
-            --accent-green: #34c759;
+            --bg: #ffffff; --sec-bg: #f4f4f5; --text: #000000; --hint: #707579;
+            --card-border: rgba(0,0,0,0.1); --accent: #3390ec; --accent-red: #ff3b30; --accent-green: #34c759;
         }
-
         [data-theme="dark"] {
-            --bg: #1c1c1d;
-            --sec-bg: #2c2c2e;
-            --text: #ffffff;
-            --hint: #8e8e93;
-            --card-border: rgba(255,255,255,0.1);
+            --bg: #1c1c1d; --sec-bg: #2c2c2e; --text: #ffffff; --hint: #8e8e93; --card-border: rgba(255,255,255,0.1);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0; padding: 16px;
-            display: flex; flex-direction: column; gap: 14px;
-            transition: background 0.3s, color 0.3s;
+            background-color: var(--bg); color: var(--text); margin: 0; padding: 16px;
+            display: flex; flex-direction: column; gap: 14px; transition: 0.3s;
         }
 
-        /* Кнопка переключения темы */
+        /* Skeleton Loading */
+        #skeleton { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; padding: 16px; box-sizing: border-box; }
+        .sk-card { background: var(--sec-bg); height: 100px; border-radius: 16px; margin-bottom: 15px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        /* Theme Toggle Animation */
         .theme-toggle {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: var(--sec-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 100;
+            position: absolute; top: 12px; right: 16px; background: var(--sec-bg);
+            border: 1px solid var(--card-border); border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .theme-toggle:active { transform: scale(0.8) rotate(180deg); }
 
-        .sub-warning {
-            background-color: rgba(255, 152, 0, 0.1);
-            border: 1px solid #ff9800;
-            padding: 8px; border-radius: 10px;
-            text-align: center; font-size: 11px; font-weight: 700;
-            margin-right: 45px; /* Чтобы не перекрывать кнопку */
-        }
+        .card { background: var(--sec-bg); border-radius: 16px; padding: 16px; border: 1px solid var(--card-border); position: relative; }
+        .error-border { border-color: var(--accent-red) !important; animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        .anti-plag-note {
-            color: var(--accent-red);
-            font-size: 12px; font-weight: 800;
-            text-align: center; text-transform: uppercase;
-        }
-
-        .card {
-            background: var(--sec-bg);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex; flex-direction: column; gap: 12px;
-            border: 1px solid var(--card-border);
-        }
-
-        label { font-size: 11px; color: var(--hint); font-weight: 600; text-transform: uppercase; }
-
+        label { font-size: 10px; color: var(--hint); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; display: block; }
         input, select, textarea {
-            background: var(--bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            color: var(--text);
-            font-size: 16px; padding: 12px;
-            width: 100%; box-sizing: border-box; outline: none;
+            background: var(--bg); border: 1px solid var(--card-border); border-radius: 10px;
+            color: var(--text); font-size: 16px; padding: 12px; width: 100%; box-sizing: border-box; outline: none;
         }
 
-        .main-btn {
-            background: var(--accent); color: #ffffff;
-            border: none; padding: 16px; border-radius: 14px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
-        }
-
-        .secondary-btn {
-            background: var(--sec-bg);
-            border: 1px solid var(--card-border);
-            color: var(--accent);
-            padding: 10px; border-radius: 12px;
-            font-size: 14px; font-weight: 600; cursor: pointer;
-            text-align: center; flex: 1;
-        }
-
-        .row { display: flex; gap: 10px; }
-        .row > div { flex: 1; }
-
-        .urgent-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--sec-bg); padding: 12px 16px; border-radius: 14px;
-            border: 1px solid var(--card-border);
-        }
-
+        /* Animated Receipt */
         .preview-box {
-            background: var(--sec-bg);
-            border: 1px dashed var(--hint);
-            border-radius: 12px; padding: 14px;
-            font-family: monospace; font-size: 13px;
-            white-space: pre-line; color: var(--text);
+            background: var(--sec-bg); border: 1px dashed var(--hint); border-radius: 12px;
+            padding: 14px; font-family: monospace; font-size: 13px; white-space: pre-line;
+            overflow: hidden; transition: max-height 0.5s ease-in-out; max-height: 0; opacity: 0;
         }
+        .preview-box.show { max-height: 500px; opacity: 1; margin-top: 10px; border: 1px solid var(--accent); }
 
-        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc; transition: .3s; border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--accent-red); }
-        input:checked + .slider:before { transform: translateX(14px); }
+        .main-btn { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; width: 100%; }
+        .row { display: flex; gap: 10px; }
+        .secondary-btn { background: var(--sec-bg); border: 1px solid var(--card-border); color: var(--accent); padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 600; text-align: center; flex: 1; }
+        
+        .disclaimer { font-size: 11px; color: var(--hint); line-height: 1.4; text-align: center; }
+        .urgent-tag { background: var(--accent-red); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; vertical-align: middle; }
+        
+        .stats-box { text-align: center; border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 5px; }
+        .stats-num { color: var(--accent-green); font-weight: 800; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <div class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">☀️</div>
+<div id="skeleton">
+    <div class="sk-card" style="height: 40px; width: 60%;"></div>
+    <div class="sk-card"></div>
+    <div class="sk-card" style="height: 150px;"></div>
+    <div class="sk-card"></div>
+</div>
 
-    <div class="sub-warning">
-        ⚠️ Подписка на канал обязательна!
+<div class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️</div>
+
+<div class="sub-warning" style="margin-right: 50px; background: rgba(255,152,0,0.1); border: 1px solid #ff9800; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center;">
+    ⚠️ Подписка обязательна!
+</div>
+
+<div class="row">
+    <div class="secondary-btn" onclick="tg.openTelegramLink('https://t.me/txtandpptx')">📢 Канал</div>
+    <div class="secondary-btn" onclick="tg.openTelegramLink('https://t.me/OTZblBblawarem')">⭐ Отзывы</div>
+</div>
+
+<div class="card">
+    <label>Вид работы</label>
+    <select id="type" onchange="update()">
+        <option value="Реферат">📝 Реферат</option>
+        <option value="Презентация">📊 Презентация</option>
+        <option value="Доклад">🎤 Доклад</option>
+        <option value="Проект">💡 Проект</option>
+        <option value="Переписать лекцию">🖋 Переписать лекцию</option>
+    </select>
+    <div class="row" style="margin-top:10px">
+        <div><label>Стр/Слайды</label><input type="number" id="count" placeholder="0" oninput="update()"></div>
+        <div><label>Дата</label><input type="text" id="date" placeholder="ДД.ММ" oninput="update()"></div>
     </div>
+</div>
 
-    <div class="row">
-        <div class="secondary-btn" onclick="tg.openTelegramLink('https://t.me/txtandpptx')">📢 Канал</div>
-        <div class="secondary-btn" onclick="tg.openTelegramLink('https://t.me/OTZblBblawarem')">⭐ Отзывы</div>
+<div class="card">
+    <label>Остальные детали</label>
+    <textarea id="details" rows="2" placeholder="Шрифт, пожелания..." oninput="update()"></textarea>
+    <div style="margin-top:10px"><label>Сумма (₽)</label><input type="text" id="price" placeholder="500" oninput="update()"></div>
+</div>
+
+<div class="card" style="padding: 12px 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size: 14px; font-weight: 700;">🚨 Срочно</span>
+        <input type="checkbox" id="urgent" onchange="update()" style="width:20px; height:20px;">
     </div>
+</div>
 
-    <div class="anti-plag-note">
-        🛑 БЕЗ ПРОВЕРКИ НА АНТИПЛАГИАТ
-    </div>
+<div class="preview-box" id="preview"></div>
 
-    <div class="card">
-        <div>
-            <label>Вид работы</label>
-            <select id="type" onchange="update()">
-                <option value="Реферат">📝 Реферат</option>
-                <option value="Презентация">📊 Презентация</option>
-                <option value="Доклад">🎤 Доклад</option>
-                <option value="Проект">💡 Проект</option>
-                <option value="Переписать лекцию">🖋 Переписать лекцию</option>
-            </select>
-        </div>
-        <div class="row">
-            <div>
-                <label id="unit-label">Кол-во стр.</label>
-                <input type="number" id="count" placeholder="0" oninput="update()">
-            </div>
-            <div>
-                <label>Срок (Дата)</label>
-                <input type="text" id="date" placeholder="Завтра" oninput="update()">
-            </div>
-        </div>
-    </div>
+<button class="main-btn" onclick="copy()">Скопировать анкету</button>
 
-    <div class="card">
-        <label>Остальные детали</label>
-        <textarea id="details" rows="2" placeholder="Напр: шрифт 14, список лит-ры..." oninput="update()"></textarea>
-        <div style="margin-top: 10px;">
-            <label>Желаемая сумма (₽)</label>
-            <input type="text" id="price" placeholder="500" oninput="update()">
-        </div>
-    </div>
+<div class="row">
+    <button class="secondary-btn" style="color:var(--accent-red)" onclick="clearAll()">🗑 Очистить</button>
+    <button class="secondary-btn" onclick="tg.openTelegramLink('https://t.me/awarem')">💬 Написать отзыв</button>
+</div>
 
-    <div class="urgent-row">
-        <span style="font-size: 14px; font-weight: 700;">🚨 Срочный заказ</span>
-        <label class="switch">
-            <input type="checkbox" id="urgent" onchange="update()">
-            <span class="slider"></span>
-        </label>
-    </div>
+<div class="stats-box">
+    <div class="stats-num">800+</div>
+    <div style="font-size:10px; color:var(--hint)">Довольных студентов в канале</div>
+</div>
 
-    <div class="preview-box" id="preview"></div>
+<div class="disclaimer">
+    💳 <b>Предоплата 100%</b><br>
+    ⚠️ Я не несу ответственности, если преподаватель изменил задание после начала работы.<br>
+    ✅ Нажимая «Копировать», вы подтверждаете, что работа будет использована там, <b>где нет проверки на антиплагиат</b>.
+</div>
 
-    <button class="main-btn" onclick="copy()">Скопировать анкету</button>
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-    <div class="row">
-        <div class="secondary-btn" style="color: var(--hint);" onclick="tg.showAlert('После отправки анкеты, прикрепите файлы через 📎')">📎 Файлы?</div>
-        <div class="secondary-btn" style="background: var(--accent-green); color: white; border: none;" onclick="nav()">💬 Написать @awarem</div>
-    </div>
+    // Skeleton
+    setTimeout(() => document.getElementById('skeleton').style.display = 'none', 1500);
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    function toggleTheme() {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        document.getElementById('theme-btn').innerText = isDark ? '☀️' : '🌙';
+    }
 
-        // Тема
-        function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('theme-toggle');
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                btn.innerText = '☀️';
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                btn.innerText = '🌙';
-            }
+    if (tg.colorScheme === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('theme-btn').innerText = '🌙';
+    }
+
+    function update() {
+        const type = document.getElementById('type').value;
+        const count = document.getElementById('count').value;
+        const date = document.getElementById('date').value;
+        const price = document.getElementById('price').value;
+        const details = document.getElementById('details').value || 'нет';
+        const isUrgent = document.getElementById('urgent').checked;
+
+        if (count && date && price) {
+            document.getElementById('preview').classList.add('show');
         }
 
-        // Авто-определение темы из TG
-        if (tg.colorScheme === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-            document.getElementById('theme-toggle').innerText = '🌙';
+        let unit = type.includes("През") ? "слайдов" : (type.includes("Перепис") ? "листов" : "страниц");
+        let header = isUrgent ? '🚨 СРОЧНЫЙ ЗАКАЗ 🚨\n' : '';
+        
+        const text = `${header}1. Вид: ${type}
+2. Кол-во ${unit}: ${count}
+3. Срок: ${date}
+4. Сумма: ${price} руб.
+5. План/Титульник: (пришлю)
+6. ФИО: (укажу в чате)
+7. Детали: ${details}
+---
+✅ Согласен на 100% предоплату и отсутствие проверки на антиплагиат.`;
+
+        document.getElementById('preview').innerText = text;
+    }
+
+    function copy() {
+        const count = document.getElementById('count');
+        const date = document.getElementById('date');
+        const price = document.getElementById('price');
+
+        if (!count.value || !date.value || !price.value) {
+            [count, date, price].forEach(el => { if(!el.value) el.classList.add('error-border') });
+            tg.showAlert("Заполните основные поля!");
+            setTimeout(() => { [count, date, price].forEach(el => el.classList.remove('error-border')) }, 2000);
+            return;
         }
 
-        function update() {
-            const type = document.getElementById('type').value;
-            const count = document.getElementById('count').value || '___';
-            const date = document.getElementById('date').value || '___';
-            const price = document.getElementById('price').value || '___';
-            const details = document.getElementById('details').value || 'нет';
-            const isUrgent = document.getElementById('urgent').checked;
-            
-            let unit = "страниц";
-            if (type.includes("Презентация")) unit = "слайдов";
-            if (type.includes("Переписать")) unit = "листов";
-            
-            document.getElementById('unit-label').innerText = "Кол-во " + (unit === "страниц" ? "стр." : unit);
+        navigator.clipboard.writeText(document.getElementById('preview').innerText);
+        tg.HapticFeedback.notificationOccurred('success');
+        tg.showAlert("Анкета готова! Отправляй в ЛС @awarem");
+        tg.openTelegramLink("https://t.me/awarem");
+    }
 
-            let header = isUrgent ? '🚨 СРОЧНЫЙ ЗАКАЗ 🚨\n' : '';
-            const text = `${header}1. Вид работы: ${type}
-2. Количество ${unit}: ${count}
-3. Срок выполнения: ${date}
-4. Желаемая сумма оплаты: ${price} руб.
-5. Наличие плана / титульного листа: 
-6. ФИО заказчика и преподавателя: 
-7. Остальные детали: ${details}`;
-
-            document.getElementById('preview').innerText = text;
+    function clearAll() {
+        if(confirm("Очистить всю анкету?")) {
+            document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+            document.getElementById('preview').classList.remove('show');
+            tg.HapticFeedback.impactOccurred('medium');
         }
+    }
 
-        function copy() {
-            navigator.clipboard.writeText(document.getElementById('preview').innerText);
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Анкета скопирована!");
-        }
-
-        function nav() { tg.openTelegramLink("https://t.me/awarem"); }
-        update();
-    </script>
+    update();
+</script>
 </body>
 </html>
