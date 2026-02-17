@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказ работы</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #222222);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .btn {
+            padding: 18px;
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line;
+            border: 1px dashed #ccc;
+        }
+        .status {
+            text-align: center;
+            font-size: 12px;
+            color: #4caf50;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>📩 Обсудить детали работы</h2>
+        <p>Нажмите на кнопку ниже, заполните данные и отправьте мне в ЛС</p>
+    </div>
+
+    <button class="btn" onclick="copyStructure()">📝 Структура сообщения</button>
+    <div id="status" class="status">Текст скопирован! Вставьте его в чат.</div>
+
+    <div id="content" class="card">
+1. Вид работы:
+• Реферат
+• Презентация
+• Доклад
+• Проект
+• Переписать лекцию из тетради в Word
+2. Количество страниц/слайдов:
+3. Срок выполнения:
+4. Желаемая сумма оплаты:
+5. Наличие плана/титульника (файлом или скриншотом):
+6. ФИО клиента и ФИО препода:
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="https://t.me/txtandpptx" style="color: var(--tg-theme-link-color); text-decoration: none;">Перейти в канал @txtandpptx</a>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Главная кнопка внизу экрана для быстрой связи
+        tg.MainButton.setText("ПОДПИСАТЬСЯ НА КАНАЛ");
+        tg.MainButton.show();
+        tg.MainButton.onClick(() => {
+            tg.openTelegramLink("https://t.me/txtandpptx");
+        });
+
+        function copyStructure() {
+            const text = document.getElementById('content').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                tg.HapticFeedback.notificationOccurred('success');
+                setTimeout(() => { status.style.display = 'none'; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
