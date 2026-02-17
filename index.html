@@ -9,9 +9,11 @@
         :root {
             --bg: #ffffff; --sec-bg: #f4f4f5; --text: #000000; --hint: #707579;
             --card-border: rgba(0,0,0,0.1); --accent: #3390ec; --accent-red: #ff3b30; --accent-green: #34c759;
+            --checkbox-bg: #dee2e6;
         }
         [data-theme="dark"] {
-            --bg: #1c1c1d; --sec-bg: #2c2c2e; --text: #ffffff; --hint: #8e8e93; --card-border: rgba(255,255,255,0.1);
+            --bg: #1c1c1d; --sec-bg: #2c2c2e; --text: #ffffff; --hint: #8e8e93; 
+            --card-border: rgba(255,255,255,0.1); --checkbox-bg: #3a3a3c;
         }
 
         body {
@@ -38,6 +40,16 @@
         input, select, textarea {
             background: var(--bg); border: 1px solid var(--card-border); border-radius: 10px;
             color: var(--text); font-size: 16px; padding: 10px; width: 100%; box-sizing: border-box; outline: none;
+        }
+
+        /* Чекбокс под тему */
+        input[type="checkbox"] {
+            appearance: none; width: 22px; height: 22px; background: var(--checkbox-bg);
+            border-radius: 6px; cursor: pointer; position: relative; transition: 0.2s;
+        }
+        input[type="checkbox"]:checked { background: var(--accent-red); }
+        input[type="checkbox"]:checked::after {
+            content: "✔"; position: absolute; color: white; font-size: 14px; left: 4px; top: 1px;
         }
 
         .preview-box {
@@ -85,7 +97,7 @@
         <option value="Переписать лекцию">🖋 Переписать лекцию</option>
     </select>
     <div class="row" style="margin-top:10px">
-        <div><label id="unit-label">Стр.</label><input type="number" id="count" placeholder="0" oninput="update()"></div>
+        <div><label id="unit-label">Количество страниц</label><input type="number" id="count" placeholder="0" oninput="update()"></div>
         <div><label>Дата (ДД.ММ)</label><input type="text" id="date" maxlength="5" oninput="update()"></div>
     </div>
 </div>
@@ -99,7 +111,7 @@
 <div class="card" style="padding: 10px 14px;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size: 13px; font-weight: 700;">🚨 Срочный заказ</span>
-        <input type="checkbox" id="urgent" onchange="update()" style="width:18px; height:18px;">
+        <input type="checkbox" id="urgent" onchange="update()">
     </div>
 </div>
 
@@ -119,7 +131,7 @@
 
 <div class="disclaimer">
     💳 <b>Предоплата 100%</b><br>
-    ⚠️ Ответственность за правки ТЗ после начала работы не несу.<br>
+    ⚠️ Ответственность за правки технического задания после начала работы не несу.<br>
     ✅ Работа предназначена для мест <b>без проверки на антиплагиат</b>.
 </div>
 
@@ -127,10 +139,8 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Скелетон
     setTimeout(() => document.getElementById('skeleton').style.display = 'none', 1000);
 
-    // Установка текущей даты в placeholder
     function setDatePlaceholder() {
         const now = new Date();
         const dd = String(now.getDate()).padStart(2, '0');
@@ -169,7 +179,7 @@
             document.getElementById('preview').classList.remove('show');
         }
 
-        document.getElementById('unit-label').innerText = type.includes("През") ? "Слайдов" : "Стр.";
+        document.getElementById('unit-label').innerText = type.includes("През") ? "Количество слайдов" : "Количество страниц";
 
         let header = isUrgent ? '🚨 СРОЧНЫЙ ЗАКАЗ 🚨\n' : '';
         const text = `${header}1. Вид: ${type}
@@ -187,7 +197,7 @@
         const c = document.getElementById('count'), d = document.getElementById('date'), p = document.getElementById('price');
         if (!c.value || d.value.length < 5 || !p.value) {
             [c, d, p].forEach(el => { if(!el.value || el.value.length < 5) el.classList.add('error-border') });
-            tg.showAlert("Заполните Стр, Дату и Сумму!");
+            tg.showAlert("Заполните все поля!");
             return;
         }
 
